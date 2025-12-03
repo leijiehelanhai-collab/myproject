@@ -1,0 +1,7 @@
+# Netlify redirects (如果使用Netlify)
+/*    /index.html   200
+
+# SPA路由重定向
+/game    /index.html    200
+/swap    /index.html    200  
+/rewards /index.html    200

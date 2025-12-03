@@ -1,0 +1,17 @@
+{
+  "name": "universal-card-game-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for BNB Chain Universal Incinerator",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network bscTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network bscMainnet",
+    "start-round": "hardhat run scripts/start-round.js --network bscTestnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.2",
+    "dotenv": "^16.3.1"
+  }
+}

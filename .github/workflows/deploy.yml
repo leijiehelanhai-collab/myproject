@@ -1,0 +1,43 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      run: npm run test -- --coverage --silent --watchAll=false
+      
+    - name: Build project
+      run: npm run build
+      env:
+        CI: false
+        REACT_APP_CONTRACT_ADDRESS: ${{ secrets.CONTRACT_ADDRESS }}
+        REACT_APP_TEST_TOKEN_1: ${{ secrets.TEST_TOKEN_1 }}
+        REACT_APP_TEST_TOKEN_2: ${{ secrets.TEST_TOKEN_2 }}
+        
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.ORG_ID }}
+        vercel-project-id: ${{ secrets.PROJECT_ID }}
+        working-directory: ./
