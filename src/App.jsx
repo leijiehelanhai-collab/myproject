@@ -6,7 +6,6 @@ import HomePage from './HomePage';
 import GamePage from './GamePage';
 import './App.css';
 import { LanguageProvider } from './contexts/LanguageContext';
-import BackgroundParticles from './components/BackgroundParticles';
 
 // 占位页面组件
 const PlaceholderPage = ({ title, icon }) => (

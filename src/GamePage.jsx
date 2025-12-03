@@ -594,7 +594,7 @@ function GamePage({ account: globalAccount }) {
           const info = await contract.methods.getRoundInfo(Number(roundId)).call();
           
           // 如果轮次已过期且无人参与，进行结算清理
-          if (currentTime >= info.endTime && info.participantCount == 0) {
+          if (currentTime >= info.endTime && info.participantCount === 0) {
             await contract.methods.settleRound(Number(roundId)).send({ from: account });
             cleanedCount++;
           }
@@ -634,7 +634,7 @@ function GamePage({ account: globalAccount }) {
 
       return () => clearInterval(interval);
     }
-  }, [contract, account]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [contract, account, loadActiveRounds]);
 
   return (
     <div className="min-h-screen relative overflow-hidden">

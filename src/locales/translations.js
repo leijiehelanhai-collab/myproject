@@ -143,9 +143,9 @@ export const translations = {
             cleanup: {
                 button: 'Cleanup Expired',
                 processing: 'Cleaning expired rounds...',
-                success_count: 'Successfully cleaned ${count} expired rounds!',
+                success_count: 'Successfully cleaned {count} expired rounds!',
                 success_none: 'No expired rounds found to clean',
-                error: 'Cleanup failed: ${error}'
+                error: 'Cleanup failed: {error}'
             },
             card: {
                 prize_pool: 'PRIZE POOL',
@@ -315,9 +315,9 @@ export const translations = {
             cleanup: {
                 button: '清理过期轮次',
                 processing: '正在清理过期轮次...',
-                success_count: '成功清理了 ${count} 个过期轮次！',
+                success_count: '成功清理了 {count} 个过期轮次！',
                 success_none: '没有发现需要清理的过期轮次',
-                error: '清理失败: ${error}'
+                error: '清理失败: {error}'
             },
             card: {
                 prize_pool: '奖池',
