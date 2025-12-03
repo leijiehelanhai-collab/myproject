@@ -21,9 +21,5 @@
       "dest": "/index.html"
     }
   ],
-  "env": {
-    "REACT_APP_CONTRACT_ADDRESS": "@contract_address",
-    "REACT_APP_TEST_TOKEN_1": "@test_token_1",
-    "REACT_APP_TEST_TOKEN_2": "@test_token_2"
-  }
+  "env": {}
 }
