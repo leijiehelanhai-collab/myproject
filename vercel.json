@@ -5,13 +5,13 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "build"
       }
     }
   ],
   "routes": [
     {
-      "src": "/assets/(.*)",
+      "src": "/static/(.*)",
       "headers": {
         "cache-control": "max-age=31536000"
       }
@@ -20,6 +20,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {}
+  ]
 }
