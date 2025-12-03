@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 import { useLanguage } from './contexts/LanguageContext';
 import './App.css';
@@ -186,81 +186,32 @@ function GamePage({ account: globalAccount }) {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalAccount, account, web3, contract, contractAddress]);
 
-  // 连接钱包
-  const connectWallet = async () => {
-    try {
-      if (window.ethereum) {
-        const web3Instance = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3Instance.eth.getAccounts();
-
-        setWeb3(web3Instance);
-        setAccount(accounts[0]);
-        setSuccess('🎉 钱包连接成功！');
-
-        // 如果有默认合约地址，自动设置合约
-        if (contractAddress && !contract) {
-          setTimeout(() => setupContract(contractAddress, web3Instance), 500);
-        }
-
-        setTimeout(() => setSuccess(''), 3000);
-      } else {
-        setError('❌ 请安装MetaMask钱包');
-      }
-    } catch (err) {
-      console.error('连接钱包失败:', err);
-      setError('连接失败: ' + (err.message || '未知错误'));
+  // 获取代币名称（用于轮次显示）
+  const getTokenName = useCallback(async (tokenAddress) => {
+    if (tokenReserves[tokenAddress]) {
+      return tokenReserves[tokenAddress];
     }
-  };
 
-  // 设置合约
-  const setupContract = async (address = null, web3Instance = null) => {
     try {
-      const useAddress = address || inputContractAddress.trim() || contractAddress;
-      const useWeb3 = web3Instance || web3;
+      const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+      const name = await tokenContract.methods.name().call();
+      const symbol = await tokenContract.methods.symbol().call();
 
-      if (!useWeb3 || !useAddress) {
-        setError('请先连接钱包并设置合约地址');
-        return;
-      }
-
-      if (!useWeb3.utils.isAddress(useAddress)) {
-        setError('合约地址格式不正确');
-        return;
-      }
-
-      const contractInstance = new useWeb3.eth.Contract(GAME_ABI, useAddress);
-      setContract(contractInstance);
-      setContractAddress(useAddress);
-
-      if (address) {
-        setSuccess(`✅ ${t('game.auto_connected')}`);
-      } else {
-        setSuccess(`✅ ${t('game.success.contract_set')}`);
-      }
-
-      // 获取合约所有者地址
-      const ownerAddress = await contractInstance.methods.owner().call();
-      setContractOwner(ownerAddress.toLowerCase());
-
-      // 立即加载数据
-      loadActiveRounds(contractInstance);
-      setTimeout(() => setSuccess(''), 3000);
+      const tokenInfo = { name, symbol };
+      setTokenReserves(prev => ({ ...prev, [tokenAddress]: tokenInfo }));
+      return tokenInfo;
     } catch (err) {
-      console.error('设置合约失败:', err);
-      setError('设置合约失败: ' + (err.message || '未知错误'));
+      const unknownInfo = { name: 'Unknown Token', symbol: 'UNKNOWN' };
+      setTokenReserves(prev => ({ ...prev, [tokenAddress]: unknownInfo }));
+      return unknownInfo;
     }
-  };
-
-  // 检查是否为合约所有者
-  const isContractOwner = () => {
-    return account && contractOwner && account.toLowerCase() === contractOwner;
-  };
+  }, [web3, tokenReserves]);
 
   // 加载活跃轮次
-  const loadActiveRounds = async (contractInstance = contract) => {
+  const loadActiveRounds = useCallback(async (contractInstance = contract) => {
     if (!contractInstance) return;
 
     try {
@@ -329,6 +280,77 @@ function GamePage({ account: globalAccount }) {
     } catch (err) {
       console.error('加载活跃轮次失败:', err);
     }
+  }, [contract, account, getTokenName]);
+
+  // 设置合约
+  const setupContract = useCallback(async (address = null, web3Instance = null) => {
+    try {
+      const useAddress = address || inputContractAddress.trim() || contractAddress;
+      const useWeb3 = web3Instance || web3;
+
+      if (!useWeb3 || !useAddress) {
+        setError('请先连接钱包并设置合约地址');
+        return;
+      }
+
+      if (!useWeb3.utils.isAddress(useAddress)) {
+        setError('合约地址格式不正确');
+        return;
+      }
+
+      const contractInstance = new useWeb3.eth.Contract(GAME_ABI, useAddress);
+      setContract(contractInstance);
+      setContractAddress(useAddress);
+
+      if (address) {
+        setSuccess(`✅ ${t('game.auto_connected')}`);
+      } else {
+        setSuccess(`✅ ${t('game.success.contract_set')}`);
+      }
+
+      // 获取合约所有者地址
+      const ownerAddress = await contractInstance.methods.owner().call();
+      setContractOwner(ownerAddress.toLowerCase());
+
+      // 立即加载数据
+      loadActiveRounds(contractInstance);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      console.error('设置合约失败:', err);
+      setError('设置合约失败: ' + (err.message || '未知错误'));
+    }
+  }, [inputContractAddress, contractAddress, web3, t, loadActiveRounds]);
+
+  // 连接钱包
+  const connectWallet = async () => {
+    try {
+      if (window.ethereum) {
+        const web3Instance = new Web3(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await web3Instance.eth.getAccounts();
+
+        setWeb3(web3Instance);
+        setAccount(accounts[0]);
+        setSuccess('🎉 钱包连接成功！');
+
+        // 如果有默认合约地址，自动设置合约
+        if (contractAddress && !contract) {
+          setTimeout(() => setupContract(contractAddress, web3Instance), 500);
+        }
+
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError('❌ 请安装MetaMask钱包');
+      }
+    } catch (err) {
+      console.error('连接钱包失败:', err);
+      setError('连接失败: ' + (err.message || '未知错误'));
+    }
+  };
+
+  // 检查是否为合约所有者
+  const isContractOwner = () => {
+    return account && contractOwner && account.toLowerCase() === contractOwner;
   };
 
   // 检查代币状态
@@ -362,27 +384,6 @@ function GamePage({ account: globalAccount }) {
     } catch (err) {
       console.error('检查代币状态失败:', err);
       return null;
-    }
-  };
-
-  // 获取代币名称（用于轮次显示）
-  const getTokenName = async (tokenAddress) => {
-    if (tokenReserves[tokenAddress]) {
-      return tokenReserves[tokenAddress];
-    }
-
-    try {
-      const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
-      const name = await tokenContract.methods.name().call();
-      const symbol = await tokenContract.methods.symbol().call();
-
-      const tokenInfo = { name, symbol };
-      setTokenReserves(prev => ({ ...prev, [tokenAddress]: tokenInfo }));
-      return tokenInfo;
-    } catch (err) {
-      const unknownInfo = { name: 'Unknown Token', symbol: 'UNKNOWN' };
-      setTokenReserves(prev => ({ ...prev, [tokenAddress]: unknownInfo }));
-      return unknownInfo;
     }
   };
 
