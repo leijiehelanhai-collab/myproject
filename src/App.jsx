@@ -4,13 +4,15 @@ import Web3 from 'web3';
 import Navigation from './Navigation';
 import HomePage from './HomePage';
 import GamePage from './GamePage';
+import GalaxyBackground from './components/GalaxyBackground';
 import './App.css';
 import { LanguageProvider } from './contexts/LanguageContext';
 
 // 占位页面组件
 const PlaceholderPage = ({ title, icon }) => (
-  <div className="min-h-screen text-white pb-24 md:pb-8">
-    <div className="container mx-auto px-6 py-16 max-w-4xl">
+  <div className="min-h-screen text-white pb-24 md:pb-8 relative overflow-hidden">
+    <GalaxyBackground withBlackHole={false} />
+    <div className="container mx-auto px-6 py-16 max-w-4xl relative z-10">
       <div className="text-center">
         <div className="text-8xl mb-8">{icon}</div>
         <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
@@ -93,7 +95,7 @@ function App() {
 
           {/* 路由内容 */}
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage account={account} connectWallet={connectWallet} />} />
             <Route path="/game" element={<GamePage account={account} />} />
             <Route path="/swap" element={
               <PlaceholderPage title="Swap" icon="🔄" />

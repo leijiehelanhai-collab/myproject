@@ -12,18 +12,26 @@ module.exports = {
           dark: '#13131f',
           card: 'rgba(20, 20, 35, 0.6)',
           input: 'rgba(30, 30, 50, 0.4)',
+          void: '#050505', // Deep Void Black
         },
         neon: {
           blue: '#00f3ff',
           pink: '#ff0099',
           green: '#00ff9d',
           purple: '#bc13fe',
-          yellow: '#f9f871'
+          yellow: '#f9f871',
+          cyan: '#00f3ff', // Neon Cyan
+          hotpink: '#ff0099', // Hot Pink
+          amber: '#ffc107', // Golden Amber
         }
       },
       fontFamily: {
-        game: ['"Orbitron"', 'sans-serif'],
-        body: ['"Exo 2"', 'sans-serif'],
+        game: ['"Orbitron"', '"Exo 2"', 'sans-serif'], // Main game titles
+        body: ['"Exo 2"', '"Inter"', 'sans-serif'], // Body text
+        mono: ['"Space Mono"', '"JetBrains Mono"', '"Courier New"', 'monospace'], // Monospace for numbers and code
+        tech: ['"Rajdhani"', '"Saira Condensed"', '"Inter"', 'sans-serif'], // Tech font for labels
+        display: ['"Audiowide"', '"Orbitron"', 'sans-serif'], // Large display text
+        cyber: ['"Electrolize"', '"Michroma"', 'sans-serif'], // Cyberpunk style
       },
       animation: {
         'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

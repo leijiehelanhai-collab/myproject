@@ -119,7 +119,7 @@ function Navigation({ account, connectWallet, disconnectWallet }) {
 
       {/* Mobile Bottom Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-game-black/95 backdrop-blur-xl border-t border-neon-blue/30 pb-safe">
-        <div className="flex justify-around items-center py-4">
+        <div className="flex justify-around items-center py-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -131,10 +131,10 @@ function Navigation({ account, connectWallet, disconnectWallet }) {
                   : 'text-gray-500 hover:text-gray-300'
                   }`}
               >
-                <span className="text-3xl mb-1.5">{item.icon}</span>
-                <span className={`text-xs font-game tracking-wider ${isActive ? 'font-bold' : ''}`}>{item.label}</span>
+                <span className="text-2xl mb-1">{item.icon}</span>
+                <span className={`text-[10px] font-game tracking-wider ${isActive ? 'font-bold' : ''}`}>{item.label}</span>
                 {isActive && (
-                  <div className="w-1 h-1 bg-neon-blue rounded-full mt-1 animate-pulse"></div>
+                  <div className="w-1 h-1 bg-neon-blue rounded-full mt-0.5 animate-pulse"></div>
                 )}
               </Link>
             );

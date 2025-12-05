@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 import { useLanguage } from './contexts/LanguageContext';
+import GalaxyBackground from './components/GalaxyBackground';
 import './App.css';
 
 // BNB链焚化炉游戏合约ABI（代币分组版，只包含需要的函数）
@@ -529,7 +530,7 @@ function GamePage({ account: globalAccount }) {
   // 计算倒计时 - 使用实时时间
   const getTimeLeft = (endTime) => {
     const left = endTime - currentTime;
-    if (left <= 0) return '已结束';
+    if (left <= 0) return t('game.card.status.end');
 
     const hours = Math.floor(left / 3600);
     const minutes = Math.floor((left % 3600) / 60);
@@ -583,7 +584,7 @@ function GamePage({ account: globalAccount }) {
 
     try {
       setSuccess('🧹 正在清理过期轮次...');
-      
+
       // 获取所有活跃轮次
       const activeRoundIds = await contract.methods.getActiveRounds().call();
       const currentTime = Math.floor(Date.now() / 1000);
@@ -593,7 +594,7 @@ function GamePage({ account: globalAccount }) {
       for (const roundId of activeRoundIds) {
         try {
           const info = await contract.methods.getRoundInfo(Number(roundId)).call();
-          
+
           // 如果轮次已过期且无人参与，进行结算清理
           if (currentTime >= info.endTime && info.participantCount === 0) {
             await contract.methods.settleRound(Number(roundId)).send({ from: account });
@@ -639,22 +640,104 @@ function GamePage({ account: globalAccount }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <GalaxyBackground withBlackHole={false} />
       <div className="container mx-auto px-6 py-8 pb-24 md:pb-8 max-w-7xl relative z-10">
-        {/* 主标题区域 */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center space-x-4 glass-panel px-8 py-6 mb-6 clip-corner-top-right relative">
-            {/* Corner Accents */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-blue"></div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-neon-blue"></div>
+        {/* Command Dashboard - Unified Header */}
+        <div className="glass-panel clip-corner p-6 md:p-8 mb-8 relative">
+          {/* Corner Accents */}
+          <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-neon-cyan"></div>
+          <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-neon-cyan"></div>
+          <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-neon-cyan"></div>
+          <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-neon-cyan"></div>
 
-            <div className="text-6xl animate-float">🎯</div>
-            <div className="text-left">
-              <h2 className="text-3xl md:text-4xl font-game font-black tracking-tight text-glow-blue bg-gradient-to-r from-neon-blue via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                {t('game.title')}
-              </h2>
-              <p className="text-gray-300 mt-2 font-mono text-sm">{t('game.subtitle')}</p>
+          {/* Title Section */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-6 border-b border-neon-cyan/20">
+            <div className="flex items-center space-x-4 mb-4 md:mb-0">
+              <div className="text-5xl md:text-6xl animate-float">🎯</div>
+              <div>
+                <h1 className="text-3xl md:text-5xl font-game font-black tracking-tight text-glow-cyan bg-gradient-to-r from-neon-cyan via-blue-400 to-neon-cyan bg-clip-text text-transparent">
+                  {t('game.title').toUpperCase()}
+                </h1>
+                <p className="text-gray-400 mt-2 font-tech text-xs md:text-sm tracking-widest uppercase">{t('game.subtitle')}</p>
+              </div>
             </div>
+
+            {/* Admin Mode Toggle - Only for Contract Owner */}
+            {isContractOwner() && (
+              <button
+                onClick={() => setIsAdminMode(!isAdminMode)}
+                className={`relative px-6 py-3 clip-corner border-2 transition-all duration-300 group hover:scale-105 ${isAdminMode
+                  ? 'bg-neon-hotpink/10 border-neon-hotpink text-neon-hotpink shadow-[0_0_20px_rgba(255,0,153,0.3)]'
+                  : 'bg-neon-cyan/10 border-neon-cyan text-neon-cyan shadow-[0_0_20px_rgba(0,243,255,0.3)]'
+                  }`}
+              >
+                <div className={`absolute top-0 left-0 w-1 h-1 ${isAdminMode ? 'bg-neon-hotpink' : 'bg-neon-cyan'}`}></div>
+                <div className={`absolute top-0 right-0 w-1 h-1 ${isAdminMode ? 'bg-neon-hotpink' : 'bg-neon-cyan'}`}></div>
+                <div className={`absolute bottom-0 left-0 w-1 h-1 ${isAdminMode ? 'bg-neon-hotpink' : 'bg-neon-cyan'}`}></div>
+                <div className={`absolute bottom-0 right-0 w-1 h-1 ${isAdminMode ? 'bg-neon-hotpink' : 'bg-neon-cyan'}`}></div>
+                <div className="flex items-center space-x-2 font-tech tracking-widest">
+                  <span className="text-xl">{isAdminMode ? '👨‍💼' : '🎮'}</span>
+                  <span className="font-bold text-sm">{isAdminMode ? t('game.admin_mode').toUpperCase() : t('game.game_mode').toUpperCase()}</span>
+                </div>
+              </button>
+            )}
           </div>
+
+          {/* Stats Grid */}
+          {contract && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Total Rounds */}
+              <div className="bg-game-void/60 border border-neon-cyan/20 rounded-lg p-4 relative overflow-hidden group hover:border-neon-cyan/40 transition-all">
+                <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-2xl">📊</span>
+                    <span className="text-[10px] font-tech tracking-widest text-gray-500 uppercase">{t('game.hall.total_rounds')}</span>
+                  </div>
+                  <div className="font-mono text-3xl font-bold text-white">{totalRounds}</div>
+                </div>
+              </div>
+
+              {/* Active Rounds */}
+              <div className="bg-game-void/60 border border-neon-cyan/20 rounded-lg p-4 relative overflow-hidden group hover:border-neon-cyan/40 transition-all">
+                <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-2xl">⚡</span>
+                    <span className="text-[10px] font-tech tracking-widest text-gray-500 uppercase">{t('game.hall.active')}</span>
+                  </div>
+                  <div className="font-mono text-3xl font-bold text-neon-cyan">{activeRounds.length}</div>
+                </div>
+              </div>
+
+              {/* My Rounds */}
+              <div className="bg-game-void/60 border border-neon-amber/20 rounded-lg p-4 relative overflow-hidden group hover:border-neon-amber/40 transition-all">
+                <div className="absolute inset-0 bg-gradient-to-br from-neon-amber/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-2xl">🎮</span>
+                    <span className="text-[10px] font-tech tracking-widest text-gray-500 uppercase">{t('game.my_number')}</span>
+                  </div>
+                  <div className="font-mono text-3xl font-bold text-neon-amber">{myActiveRounds.length}</div>
+                </div>
+              </div>
+
+              {/* System Status */}
+              <div className="bg-game-void/60 border border-neon-green/20 rounded-lg p-4 relative overflow-hidden group hover:border-neon-green/40 transition-all">
+                <div className="absolute inset-0 bg-gradient-to-br from-neon-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-2xl">🌐</span>
+                    <span className="text-[10px] font-tech tracking-widest text-gray-500 uppercase">{t('game.status.active')}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="blinking-dot green"></div>
+                    <span className="font-tech text-sm font-bold text-neon-green tracking-wider">{t('nav.system_online').toUpperCase()}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 连接钱包 */}
@@ -677,46 +760,6 @@ function GamePage({ account: globalAccount }) {
           </div>
         )}
 
-        {/* 管理员模式切换 - 仅合约所有者可见 */}
-        {isContractOwner() && (
-          <div className="flex justify-center mb-8">
-            <button
-              onClick={() => setIsAdminMode(!isAdminMode)}
-              className={`relative px-8 py-3 clip-corner border-2 transition-all duration-300 group hover:scale-105 ${isAdminMode
-                ? 'bg-neon-pink/10 border-neon-pink text-neon-pink shadow-[0_0_20px_rgba(255,0,153,0.3)]'
-                : 'bg-neon-blue/10 border-neon-blue text-neon-blue shadow-[0_0_20px_rgba(0,243,255,0.3)]'
-                }`}
-            >
-              {/* Corner accents */}
-              <div className={`absolute top-0 left-0 w-1 h-1 ${isAdminMode ? 'bg-neon-pink' : 'bg-neon-blue'}`}></div>
-              <div className={`absolute top-0 right-0 w-1 h-1 ${isAdminMode ? 'bg-neon-pink' : 'bg-neon-blue'}`}></div>
-              <div className={`absolute bottom-0 left-0 w-1 h-1 ${isAdminMode ? 'bg-neon-pink' : 'bg-neon-blue'}`}></div>
-              <div className={`absolute bottom-0 right-0 w-1 h-1 ${isAdminMode ? 'bg-neon-pink' : 'bg-neon-blue'}`}></div>
-
-              <div className="flex items-center space-x-3 font-game tracking-wider">
-                <span className="text-xl">{isAdminMode ? '👨‍💼' : '🎮'}</span>
-                <span className="font-bold">{isAdminMode ? t('game.owner_mode').toUpperCase() : t('game.admin_mode').toUpperCase()}</span>
-              </div>
-            </button>
-          </div>
-        )}
-
-        {/* 普通用户显示 */}
-        {account && !isContractOwner() && (
-          <div className="flex justify-center mb-8">
-            <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 backdrop-blur-md border border-green-500/20 rounded-xl px-6 py-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  🎮
-                </div>
-                <div>
-                  <div className="font-semibold text-green-300">{t('game.game_mode')}</div>
-                  <div className="text-xs text-gray-400">{t('game.game_mode_desc')}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* 自动连接合约状态 */}
         {account && !contract && contractAddress && (
@@ -989,51 +1032,15 @@ function GamePage({ account: globalAccount }) {
           </div>
         )}
 
-        {/* 活跃轮次列表 */}
+        {/* Game Rules Panel */}
+        {contract && <GameRulesPanel />}
+
+        {/* Active Rounds Grid */}
         {contract && (
-          <div className="space-y-8">
-            {/* 标题区域 */}
-            {/* 标题区域 */}
-            <div className="relative glass-panel clip-corner p-6 border-neon-green/30">
-              {/* Corner Accents */}
-              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green"></div>
-              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-green"></div>
-              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-green"></div>
-              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-green"></div>
-
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-game-dark clip-corner flex items-center justify-center border border-neon-green/50">
-                    <span className="text-2xl animate-pulse">🎯</span>
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-game font-bold text-neon-green text-glow-green tracking-wide">
-                      {t('game.hall.title').toUpperCase()}
-                    </h2>
-                    <p className="text-gray-400 text-xs font-mono mt-1 tracking-widest">{t('game.hall.desc').toUpperCase()}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-8 bg-black/20 p-3 rounded-lg border border-white/5">
-                  <div className="text-center px-4 border-r border-white/10">
-                    <div className="text-2xl font-game text-white">{totalRounds}</div>
-                    <div className="text-[10px] text-gray-500 font-mono uppercase">{t('game.hall.total_rounds')}</div>
-                  </div>
-                  <div className="text-center px-4">
-                    <div className="text-2xl font-game text-neon-blue">{activeRounds.length}</div>
-                    <div className="text-[10px] text-gray-500 font-mono uppercase">{t('game.hall.active')}</div>
-                  </div>
-                  <div className="flex flex-col items-center justify-center pl-2">
-                    <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse shadow-[0_0_10px_#00ff9d]"></div>
-                    <span className="text-[8px] text-neon-green mt-1 font-mono">ONLINE</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+          <div>
             {activeRounds.length === 0 ? (
               <div className="relative glass-panel clip-corner p-12 text-center border-white/5 flex flex-col items-center justify-center min-h-[300px]">
-                {/* Scanline overlay for this specific panel */}
+                {/* Scanline overlay */}
                 <div className="absolute inset-0 bg-scanline opacity-10 pointer-events-none"></div>
 
                 <div className="relative mb-6">
@@ -1055,15 +1062,15 @@ function GamePage({ account: globalAccount }) {
                 </p>
 
                 {isAdminMode && (
-                  <div className="mt-8 p-4 border border-neon-pink/30 bg-neon-pink/5 rounded clip-corner max-w-md">
-                    <p className="text-neon-pink font-mono text-xs animate-pulse">
+                  <div className="mt-8 p-4 border border-neon-hotpink/30 bg-neon-hotpink/5 rounded clip-corner max-w-md">
+                    <p className="text-neon-hotpink font-mono text-xs animate-pulse">
                       ⚠ ADMIN ALERT: {t('game.hall.admin_hint')}
                     </p>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {activeRounds.map((round) => (
                   <RoundCard
                     key={round.roundId}
@@ -1087,7 +1094,231 @@ function GamePage({ account: globalAccount }) {
   );
 }
 
-// 轮次卡片组件
+// Segmented Progress Bar Component
+function SegmentedBar({ percent, isWarning = false, segments = 10 }) {
+  return (
+    <div className="segmented-bar">
+      {Array.from({ length: segments }).map((_, i) => {
+        const segmentThreshold = ((i + 1) / segments) * 100;
+        const isActive = percent >= segmentThreshold;
+        return (
+          <div
+            key={i}
+            className={`segment ${isActive ? 'active' : ''} ${isWarning && isActive ? 'warn' : ''}`}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+// Game Rules Panel Component - Cyberpunk Blueprint Style
+function GameRulesPanel() {
+  const { t } = useLanguage();
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  return (
+    <div className="relative glass-panel clip-corner p-6 md:p-8 mb-8">
+      {/* Corner Accents */}
+      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-neon-purple"></div>
+      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-neon-purple"></div>
+      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-neon-purple"></div>
+      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-neon-purple"></div>
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-neon-purple/20">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 bg-neon-purple/10 rounded-lg flex items-center justify-center border border-neon-purple/30">
+            <span className="text-2xl">📋</span>
+          </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-game font-black tracking-tight text-neon-purple text-glow-pink">
+              {t('game.rules.title').toUpperCase()}
+            </h2>
+            <p className="text-gray-400 text-xs font-tech mt-1 tracking-widest uppercase">{t('game.rules.subtitle')}</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-neon-purple hover:text-white transition-colors p-2"
+        >
+          <span className="text-2xl">{isExpanded ? '▼' : '▶'}</span>
+        </button>
+      </div>
+
+      {/* Content - Bento Grid Layout */}
+      {isExpanded && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Dual Token System */}
+          <div className="bg-game-void/60 border border-neon-cyan/20 rounded-lg p-6 relative overflow-hidden group hover:border-neon-cyan/40 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <h3 className="text-lg font-tech font-bold text-neon-cyan mb-4 uppercase tracking-wider flex items-center space-x-2">
+                <span>🔄</span>
+                <span>{t('game.rules.dual_token.title')}</span>
+              </h3>
+
+              {/* Fuel Token */}
+              <div className="mb-4 p-3 bg-neon-hotpink/10 border border-neon-hotpink/30 rounded-lg">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-xl">🔥</span>
+                  <span className="font-tech text-sm font-bold text-neon-hotpink uppercase">{t('game.rules.dual_token.fuel')}</span>
+                </div>
+                <p className="text-xs text-gray-400 font-mono">{t('game.rules.dual_token.fuel_desc')}</p>
+                <div className="mt-2 flex items-center space-x-2">
+                  <div className="flex-1 h-2 bg-black/50 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-neon-hotpink to-red-500 animate-pulse" style={{ width: '100%' }}></div>
+                  </div>
+                  <span className="font-mono text-xs text-neon-hotpink font-bold">100%</span>
+                </div>
+              </div>
+
+              {/* Settlement Token */}
+              <div className="p-3 bg-neon-amber/10 border border-neon-amber/30 rounded-lg">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-xl">💰</span>
+                  <span className="font-tech text-sm font-bold text-neon-amber uppercase">{t('game.rules.dual_token.settlement')}</span>
+                </div>
+                <p className="text-xs text-gray-400 font-mono">{t('game.rules.dual_token.settlement_desc')}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Fund Allocation - 80/15/5 */}
+          <div className="bg-game-void/60 border border-neon-amber/20 rounded-lg p-6 relative overflow-hidden group hover:border-neon-amber/40 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-neon-amber/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <h3 className="text-lg font-tech font-bold text-neon-amber mb-4 uppercase tracking-wider flex items-center space-x-2">
+                <span>📊</span>
+                <span>{t('game.rules.allocation.title')}</span>
+              </h3>
+
+              {/* Energy Bars Visualization */}
+              <div className="space-y-4">
+                {/* 80% Winner Pool */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">🏆</span>
+                      <span className="font-tech text-xs text-gray-400 uppercase">{t('game.rules.allocation.winner')}</span>
+                    </div>
+                    <span className="font-mono text-sm font-bold text-neon-amber">80%</span>
+                  </div>
+                  <div className="h-3 bg-black/50 rounded-full overflow-hidden border border-neon-amber/30">
+                    <div className="h-full bg-gradient-to-r from-neon-amber to-yellow-500" style={{ width: '80%' }}></div>
+                  </div>
+                </div>
+
+                {/* 15% Reserve */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">🔋</span>
+                      <span className="font-tech text-xs text-gray-400 uppercase">{t('game.rules.allocation.reserve')}</span>
+                    </div>
+                    <span className="font-mono text-sm font-bold text-neon-cyan">15%</span>
+                  </div>
+                  <div className="h-3 bg-black/50 rounded-full overflow-hidden border border-neon-cyan/30">
+                    <div className="h-full bg-gradient-to-r from-neon-cyan to-blue-500" style={{ width: '15%' }}></div>
+                  </div>
+                </div>
+
+                {/* 5% Development */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">⚙️</span>
+                      <span className="font-tech text-xs text-gray-400 uppercase">{t('game.rules.allocation.dev')}</span>
+                    </div>
+                    <span className="font-mono text-sm font-bold text-neon-green">5%</span>
+                  </div>
+                  <div className="h-3 bg-black/50 rounded-full overflow-hidden border border-neon-green/30">
+                    <div className="h-full bg-gradient-to-r from-neon-green to-green-500" style={{ width: '5%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Game Cycle Flow - Spans 2 columns on large screens */}
+          <div className="md:col-span-2 lg:col-span-1 bg-game-void/60 border border-neon-purple/20 rounded-lg p-6 relative overflow-hidden group hover:border-neon-purple/40 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <h3 className="text-lg font-tech font-bold text-neon-purple mb-4 uppercase tracking-wider flex items-center space-x-2">
+                <span>🔄</span>
+                <span>{t('game.rules.cycle.title')}</span>
+              </h3>
+
+              {/* Flow Pipeline */}
+              <div className="space-y-3">
+                {/* Step 1 */}
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-neon-cyan/20 border-2 border-neon-cyan flex items-center justify-center flex-shrink-0">
+                    <span className="font-mono text-xs font-bold text-neon-cyan">1</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-tech text-sm font-bold text-white uppercase">{t('game.rules.cycle.step1')}</div>
+                    <div className="text-xs text-gray-400 font-mono mt-1">{t('game.rules.cycle.step1_desc')}</div>
+                  </div>
+                </div>
+
+                {/* Connector */}
+                <div className="ml-4 h-4 border-l-2 border-dashed border-neon-cyan/30"></div>
+
+                {/* Step 2 */}
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-neon-amber/20 border-2 border-neon-amber flex items-center justify-center flex-shrink-0">
+                    <span className="font-mono text-xs font-bold text-neon-amber">2</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-tech text-sm font-bold text-white uppercase">{t('game.rules.cycle.step2')}</div>
+                    <div className="text-xs text-gray-400 font-mono mt-1">{t('game.rules.cycle.step2_desc')}</div>
+                  </div>
+                </div>
+
+                {/* Connector */}
+                <div className="ml-4 h-4 border-l-2 border-dashed border-neon-amber/30"></div>
+
+                {/* Step 3 - Logic Gate */}
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-neon-hotpink/20 border-2 border-neon-hotpink flex items-center justify-center flex-shrink-0">
+                    <span className="font-mono text-xs font-bold text-neon-hotpink">3</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-tech text-sm font-bold text-white uppercase">{t('game.rules.cycle.step3')}</div>
+                    <div className="text-xs text-gray-400 font-mono mt-1">{t('game.rules.cycle.step3_desc')}</div>
+                    {/* Logic Gate Visualization */}
+                    <div className="mt-2 flex items-center space-x-2 text-[10px] font-mono">
+                      <span className="px-2 py-1 bg-neon-hotpink/20 border border-neon-hotpink/40 rounded text-neon-hotpink">{t('game.rules.cycle.condition_a')}</span>
+                      <span className="text-gray-500">{t('game.rules.cycle.or')}</span>
+                      <span className="px-2 py-1 bg-neon-hotpink/20 border border-neon-hotpink/40 rounded text-neon-hotpink">{t('game.rules.cycle.condition_b')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Connector */}
+                <div className="ml-4 h-4 border-l-2 border-dashed border-neon-hotpink/30"></div>
+
+                {/* Step 4 */}
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-neon-green/20 border-2 border-neon-green flex items-center justify-center flex-shrink-0">
+                    <span className="font-mono text-xs font-bold text-neon-green">4</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-tech text-sm font-bold text-white uppercase">{t('game.rules.cycle.step4')}</div>
+                    <div className="text-xs text-gray-400 font-mono mt-1">{t('game.rules.cycle.step4_desc')}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// 轮次卡片组件 - Holographic Data Plate
 function RoundCard({ round, isParticipated, onJoin, onSettle, getTimeLeft, getPlayerNumber, account, loading, isContractOwner }) {
   const { t } = useLanguage();
   const [playerNumber, setPlayerNumber] = useState(0);
@@ -1098,137 +1329,141 @@ function RoundCard({ round, isParticipated, onJoin, onSettle, getTimeLeft, getPl
     }
   }, [round.roundId, isParticipated]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Calculate progress percentage
+  // Calculate progress percentages
   const progressPercent = (round.participantCount / 20) * 100;
-
-  // Calculate time progress (assuming 24h max for visualization if total duration unknown, or just use remaining)
-  // For visual flair, we'll just use a static ring for time or calculate based on start/end
   const totalDuration = round.endTime - round.startTime;
   const elapsed = (Date.now() / 1000) - round.startTime;
   const timePercent = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+  const isExpired = Date.now() / 1000 >= round.endTime;
+  const isEndingSoon = !isExpired && (100 - timePercent) < 20;
+
+  // Calculate total prize pool
+  const currentPot = Web3.utils.fromWei(round.currentPot?.toString() || '0', 'ether');
+  const inheritedReserve = Web3.utils.fromWei(round.inheritedReserve?.toString() || '0', 'ether');
+  const totalPot = (parseFloat(currentPot) + parseFloat(inheritedReserve)).toFixed(4);
 
   return (
-    <div className="group relative glass-panel clip-corner overflow-hidden hover:border-neon-blue/80 transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,243,255,0.2)]">
+    <div className="group relative glass-panel clip-corner overflow-hidden hover:border-neon-cyan/60 transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,243,255,0.3)]">
       {/* Corner Accents */}
-      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-blue/50 group-hover:border-neon-blue transition-colors"></div>
-      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-blue/50 group-hover:border-neon-blue transition-colors"></div>
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-blue/50 group-hover:border-neon-blue transition-colors"></div>
-      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-blue/50 group-hover:border-neon-blue transition-colors"></div>
+      <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors"></div>
+      <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors"></div>
+      <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors"></div>
+      <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-neon-cyan/40 group-hover:border-neon-cyan transition-colors"></div>
+
+      {/* Round ID Watermark */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
+        <span className="font-game text-[120px] md:text-[150px] font-black text-white/[0.02] leading-none">
+          #{round.roundId}
+        </span>
+      </div>
 
       {/* Hover Glow Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/0 via-neon-blue/5 to-neon-purple/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/0 via-neon-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
-      {/* Card Header */}
-      <div className="relative p-5 border-b border-neon-blue/10 flex justify-between items-center bg-gradient-to-r from-game-dark/80 to-game-dark/50">
-        <div className="flex items-center space-x-4">
+      {/* Card Header - Compact */}
+      <div className="relative p-4 border-b border-neon-cyan/10 flex justify-between items-center bg-gradient-to-r from-game-void/90 to-game-void/60 z-10">
+        <div className="flex items-center space-x-3">
           <div className="relative">
-            <div className="w-14 h-14 bg-game-dark rounded-lg flex items-center justify-center border-2 border-neon-blue/30 group-hover:border-neon-blue transition-all clip-corner">
-              <span className="font-game text-2xl text-neon-blue font-black text-glow-blue">#{round.roundId}</span>
+            <div className="w-12 h-12 bg-game-void rounded-lg flex items-center justify-center border border-neon-cyan/30 group-hover:border-neon-cyan transition-all clip-corner">
+              <span className="font-mono text-lg text-neon-cyan font-bold">#{round.roundId}</span>
             </div>
-            {/* Status Dot */}
-            <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-game-dark ${Date.now() / 1000 >= round.endTime ? 'bg-red-500 animate-pulse' : 'bg-neon-green animate-pulse'
-              }`}></div>
+            {/* Status Blinking Dot */}
+            <div className={`absolute -top-1 -right-1 blinking-dot ${isExpired ? 'red' : isEndingSoon ? 'red' : 'green'}`}></div>
           </div>
 
           <div>
-            <h3 className="font-game text-xl text-white tracking-widest group-hover:text-neon-blue transition-colors">
+            <h3 className="font-tech text-base md:text-lg text-white tracking-widest uppercase group-hover:text-neon-cyan transition-colors">
               {round.tokenSymbol || 'UNKNOWN'}
             </h3>
-            <div className="flex items-center space-x-2 text-xs text-gray-400 font-mono mt-1">
+            <div className="flex items-center space-x-2 text-[10px] text-gray-500 font-tech mt-0.5 uppercase tracking-wider">
               <span>{round.tokenName || 'Unknown Token'}</span>
-              <span className="w-1 h-1 bg-neon-pink rounded-full animate-pulse"></span>
-              <span className="text-neon-pink font-bold">{t('game.card.burning').toUpperCase()}</span>
+              <span className="w-1 h-1 bg-neon-hotpink rounded-full animate-pulse"></span>
+              <span className="text-neon-hotpink font-bold">BURNING</span>
             </div>
           </div>
         </div>
 
-        <div className="text-right">
-          <div className="font-game text-3xl text-neon-green text-glow-blue">
-            {(() => {
-              const currentPot = Web3.utils.fromWei(round.currentPot?.toString() || '0', 'ether');
-              const inheritedReserve = Web3.utils.fromWei(round.inheritedReserve?.toString() || '0', 'ether');
-              const totalPot = (parseFloat(currentPot) + parseFloat(inheritedReserve)).toFixed(4);
-              return totalPot;
-            })()}
-            <span className="text-sm ml-1 text-gray-400">BNB</span>
+        {/* Timer with Status Dot */}
+        <div className="flex items-center space-x-2">
+          <div className={`blinking-dot ${isExpired ? 'red' : isEndingSoon ? 'red' : 'green'}`}></div>
+          <div className="text-right">
+            <div className={`font-mono text-sm md:text-base font-bold ${isExpired ? 'text-red-400' : isEndingSoon ? 'text-neon-hotpink' : 'text-neon-cyan'}`}>
+              {getTimeLeft(round.endTime)}
+            </div>
+            <div className="text-[8px] uppercase tracking-widest text-gray-600 font-tech">{t('game.card.time_left')}</div>
           </div>
-          <div className="text-[10px] uppercase tracking-widest text-gray-500 font-mono">{t('game.card.prize_pool').toUpperCase()}</div>
         </div>
       </div>
 
-      {/* Card Body */}
-      <div className="p-6">
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {/* Participants Circular Progress */}
-          <div className="bg-game-dark/50 rounded-xl p-3 flex items-center space-x-3 border border-white/5">
-            <div className="relative w-12 h-12 flex-shrink-0">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-gray-800" />
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent"
-                  className="text-neon-blue transition-all duration-1000 ease-out"
-                  strokeDasharray={2 * Math.PI * 20}
-                  strokeDashoffset={2 * Math.PI * 20 * (1 - progressPercent / 100)}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">
-                {Math.round(progressPercent)}%
-              </div>
+      {/* Card Body - Prize Pool as Visual Center */}
+      <div className="relative p-6 z-10">
+        {/* PRIZE POOL - ABSOLUTE CENTER */}
+        <div className="text-center mb-6 py-6 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-amber/5 to-transparent rounded-xl"></div>
+          <div className="relative">
+            <div className="text-[10px] font-tech tracking-[0.3em] text-gray-500 uppercase mb-2">{t('game.card.prize_pool')}</div>
+            <div className="font-mono text-4xl md:text-5xl font-black bg-gradient-to-r from-neon-amber via-yellow-300 to-neon-amber bg-clip-text text-transparent text-glow-gold animate-pulse">
+              {totalPot}
             </div>
-            <div>
-              <div className="text-sm font-bold text-white">{round.participantCount}/20</div>
-              <div className="text-[10px] text-gray-400 uppercase">{t('game.card.players').toUpperCase()}</div>
-            </div>
-          </div>
-
-          {/* Time Circular Progress */}
-          <div className="bg-game-dark/50 rounded-xl p-3 flex items-center space-x-3 border border-white/5">
-            <div className="relative w-12 h-12 flex-shrink-0">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-gray-800" />
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent"
-                  className={`${Date.now() / 1000 >= round.endTime ? 'text-red-500' : 'text-neon-purple'} transition-all duration-1000 ease-out`}
-                  strokeDasharray={2 * Math.PI * 20}
-                  strokeDashoffset={2 * Math.PI * 20 * (1 - timePercent / 100)}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xs">
-                {Date.now() / 1000 >= round.endTime ? t('game.card.status.end').toUpperCase() : t('game.card.status.run').toUpperCase()}
-              </div>
-            </div>
-            <div>
-              <div className={`text-sm font-bold ${Date.now() / 1000 >= round.endTime ? 'text-red-400' : 'text-white'}`}>
-                {getTimeLeft(round.endTime)}
-              </div>
-              <div className="text-[10px] text-gray-400 uppercase">{t('game.card.time_left').toUpperCase()}</div>
-            </div>
+            <div className="font-tech text-sm text-gray-400 tracking-widest uppercase mt-1">BNB</div>
           </div>
         </div>
 
-        {/* Info Row */}
-        <div className="flex justify-between items-center mb-6 text-xs text-gray-400 font-mono bg-black/20 p-2 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <span>{t('game.card.ticket').toUpperCase()}:</span>
-            <span className="text-white">{parseFloat(Web3.utils.fromWei(round.ticketPrice?.toString() || '0', 'ether')).toFixed(3)} BNB</span>
+        {/* Segmented Progress Bars */}
+        <div className="space-y-4 mb-6">
+          {/* Participants Bar */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">👥</span>
+                <span className="text-[10px] font-tech tracking-widest text-gray-500 uppercase">{t('game.card.players')}</span>
+              </div>
+              <span className="font-mono text-sm font-bold text-white">{round.participantCount}<span className="text-gray-600">/20</span></span>
+            </div>
+            <SegmentedBar percent={progressPercent} isWarning={false} segments={10} />
           </div>
-          <div className="w-px h-3 bg-gray-700"></div>
-          <div className="flex items-center space-x-2">
-            <span>{t('game.card.burn').toUpperCase()}:</span>
-            <span className="text-white">{parseFloat(Web3.utils.fromWei(round.burnAmount?.toString() || '0', 'ether')).toFixed(0)} {t('game.card.tokens').toUpperCase()}</span>
+
+          {/* Time Progress Bar */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">⏱️</span>
+                <span className="text-[10px] font-tech tracking-widest text-gray-500 uppercase">{t('game.time_left')}</span>
+              </div>
+              <span className={`font-mono text-sm font-bold ${isExpired ? 'text-red-400' : isEndingSoon ? 'text-neon-hotpink' : 'text-neon-cyan'}`}>
+                {Math.round(100 - timePercent)}%
+              </span>
+            </div>
+            <SegmentedBar percent={timePercent} isWarning={isEndingSoon || isExpired} segments={10} />
+          </div>
+        </div>
+
+        {/* Info Row - Compact */}
+        <div className="grid grid-cols-2 gap-3 mb-6 text-[10px] font-tech">
+          <div className="bg-game-void/60 border border-white/5 rounded-lg p-2">
+            <div className="text-gray-500 uppercase tracking-wider mb-1">{t('game.card.ticket')}</div>
+            <div className="font-mono text-sm text-white font-bold">{parseFloat(Web3.utils.fromWei(round.ticketPrice?.toString() || '0', 'ether')).toFixed(3)} BNB</div>
+          </div>
+          <div className="bg-game-void/60 border border-white/5 rounded-lg p-2">
+            <div className="text-gray-500 uppercase tracking-wider mb-1">{t('game.card.burn')}</div>
+            <div className="font-mono text-sm text-white font-bold">{parseFloat(Web3.utils.fromWei(round.burnAmount?.toString() || '0', 'ether')).toFixed(0)} {t('game.card.tokens')}</div>
           </div>
         </div>
 
         {/* Action Button */}
-        {Date.now() / 1000 >= round.endTime && round.participantCount > 0 && round.isActive ? (
+        {isExpired && round.participantCount > 0 && round.isActive ? (
           (() => {
             const isWinner = round.maxNumberHolder && round.maxNumberHolder.toLowerCase() === account?.toLowerCase();
             const canSettle = isWinner || isContractOwner();
 
             if (!canSettle) {
               return (
-                <div className="w-full bg-gray-800/50 border border-gray-700 text-gray-400 font-mono py-3 px-6 rounded-xl text-center flex flex-col items-center justify-center">
-                  <span className="font-bold">{t('game.card.status.waiting').toUpperCase()}</span>
+                <div className="w-full bg-game-void/60 border border-gray-700/50 text-gray-400 font-tech py-3 px-6 rounded-lg text-center">
+                  <span className="font-bold text-xs uppercase tracking-wider">{t('game.card.status.waiting')}</span>
                   {round.maxNumberHolder && (
-                    <span className="text-[10px] mt-1 text-gray-500">{t('game.card.winner').toUpperCase()}: {round.maxNumberHolder.slice(0, 6)}...{round.maxNumberHolder.slice(-4)}</span>
+                    <div className="text-[10px] mt-1 text-gray-600 font-mono">
+                      {t('game.card.winner').toUpperCase()}: {round.maxNumberHolder.slice(0, 6)}...{round.maxNumberHolder.slice(-4)}
+                    </div>
                   )}
                 </div>
               );
@@ -1238,23 +1473,38 @@ function RoundCard({ round, isParticipated, onJoin, onSettle, getTimeLeft, getPl
               <button
                 onClick={onSettle}
                 disabled={loading}
-                className="w-full group relative overflow-hidden bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)]"
+                className="w-full group relative overflow-hidden bg-gradient-to-r from-neon-amber to-yellow-500 hover:from-yellow-400 hover:to-neon-amber text-game-void font-tech font-bold py-4 px-6 rounded-lg transition-all shadow-[0_0_20px_rgba(255,193,7,0.4)] hover:shadow-[0_0_35px_rgba(255,193,7,0.6)] pulsate-btn disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                <span className="relative z-10 flex items-center justify-center space-x-2">
-                  <span>{loading ? 'PROCESSING...' : isWinner ? '🏆 ' + t('game.card.claim').toUpperCase() : '⚡ ' + t('game.card.settle').toUpperCase()}</span>
+                <span className="relative z-10 flex items-center justify-center space-x-2 text-sm uppercase tracking-wider">
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                      <span>{t('game.loading').toUpperCase()}</span>
+                    </>
+                  ) : isWinner ? (
+                    <>
+                      <span>🏆</span>
+                      <span>{t('game.card.claim').toUpperCase()}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>⚡</span>
+                      <span>{t('game.card.settle').toUpperCase()}</span>
+                    </>
+                  )}
                 </span>
               </button>
             );
           })()
         ) : isParticipated ? (
-          <div className="bg-neon-green/10 border border-neon-green/30 rounded-xl p-3 text-center relative overflow-hidden">
+          <div className="bg-neon-green/10 border border-neon-green/30 rounded-lg p-4 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-neon-green/5 animate-pulse"></div>
             <div className="relative z-10">
-              <div className="text-neon-green font-bold text-sm">{t('game.card.joined').toUpperCase()}</div>
+              <div className="text-neon-green font-tech font-bold text-sm uppercase tracking-wider">{t('game.card.joined').toUpperCase()}</div>
               {playerNumber > 0 && (
-                <div className="text-xs text-gray-300 mt-1 font-mono">
-                  {t('game.card.your_number').toUpperCase()}: <span className="text-white font-bold text-lg">{playerNumber}</span>
+                <div className="text-xs text-gray-400 mt-2 font-tech uppercase tracking-wider">
+                  {t('game.card.your_number').toUpperCase()}: <span className="text-white font-mono font-bold text-xl ml-1">{playerNumber}</span>
                 </div>
               )}
             </div>
@@ -1262,32 +1512,42 @@ function RoundCard({ round, isParticipated, onJoin, onSettle, getTimeLeft, getPl
         ) : (
           <button
             onClick={onJoin}
-            disabled={loading || round.participantCount >= 20 || Date.now() / 1000 >= round.endTime}
-            className="relative w-full group px-6 py-4 bg-game-black border-2 border-neon-blue clip-corner transition-all duration-300 hover:bg-neon-blue/10 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-game-black disabled:hover:scale-100"
+            disabled={loading || round.participantCount >= 20 || isExpired}
+            className="hollow-btn relative w-full group px-6 py-4 bg-transparent border-2 border-neon-cyan clip-corner transition-all duration-300 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-transparent"
           >
             {/* Corner markers */}
-            <div className="absolute top-0 left-0 w-2 h-2 bg-neon-blue"></div>
-            <div className="absolute top-0 right-0 w-2 h-2 bg-neon-blue"></div>
-            <div className="absolute bottom-0 left-0 w-2 h-2 bg-neon-blue"></div>
-            <div className="absolute bottom-0 right-0 w-2 h-2 bg-neon-blue"></div>
+            <div className="absolute top-0 left-0 w-2 h-2 bg-neon-cyan"></div>
+            <div className="absolute top-0 right-0 w-2 h-2 bg-neon-cyan"></div>
+            <div className="absolute bottom-0 left-0 w-2 h-2 bg-neon-cyan"></div>
+            <div className="absolute bottom-0 right-0 w-2 h-2 bg-neon-cyan"></div>
+
+            {/* Fill effect on hover */}
+            <div className="absolute inset-0 bg-neon-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
 
             {/* Scan line effect */}
-            <div className="absolute inset-0 bg-neon-blue/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700 ease-in-out"></div>
 
-            <span className="relative z-10 flex items-center justify-center space-x-2 font-game text-lg font-bold text-neon-blue group-hover:text-white transition-colors">
+            <span className="relative z-10 flex items-center justify-center space-x-2 font-tech text-base font-bold text-neon-cyan group-hover:text-game-void transition-colors uppercase tracking-wider">
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                  <span>PROCESSING...</span>
+                  <span>{t('game.loading').toUpperCase()}</span>
                 </>
               ) : round.participantCount >= 20 ? (
-                <span>🚫 {t('game.card.full').toUpperCase()}</span>
-              ) : Date.now() / 1000 >= round.endTime ? (
-                <span>⏰ {t('game.card.expired').toUpperCase()}</span>
+                <>
+                  <span>🚫</span>
+                  <span>{t('game.card.full').toUpperCase()}</span>
+                </>
+              ) : isExpired ? (
+                <>
+                  <span>⏰</span>
+                  <span>{t('game.card.expired').toUpperCase()}</span>
+                </>
               ) : (
                 <>
-                  <span>🎲 {t('game.card.enter_game').toUpperCase()}</span>
-                  <span className="text-xs opacity-70 font-mono">
+                  <span>🎲</span>
+                  <span>{t('game.card.enter_game').toUpperCase()}</span>
+                  <span className="text-xs opacity-70 font-mono normal-case">
                     [{parseFloat(Web3.utils.fromWei(round.ticketPrice?.toString() || '0', 'ether')).toFixed(3)} BNB]
                   </span>
                 </>
