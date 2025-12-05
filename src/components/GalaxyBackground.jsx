@@ -8,27 +8,6 @@ const GalaxyBackground = ({ withBlackHole = false }) => {
         const ctx = canvas.getContext('2d');
         let animationFrameId;
         let stars = [];
-        let planets = [];
-
-        // Load planet images
-        const planetImages = [
-            new Image(),
-            new Image(),
-            new Image(),
-            new Image(),
-            new Image(),
-            new Image(),
-            new Image(),
-            new Image()
-        ];
-        planetImages[0].src = '/assets/planets/earth.png';
-        planetImages[1].src = '/assets/planets/mars.png';
-        planetImages[2].src = '/assets/planets/moon.png';
-        planetImages[3].src = '/assets/planets/jupiter.png';
-        planetImages[4].src = '/assets/planets/venus.png';
-        planetImages[5].src = '/assets/planets/mercury.png';
-        planetImages[6].src = '/assets/planets/ice.png';
-        planetImages[7].src = '/assets/planets/lava.png';
 
         const resizeCanvas = () => {
             canvas.width = window.innerWidth;
@@ -61,107 +40,9 @@ const GalaxyBackground = ({ withBlackHole = false }) => {
             }
         }
 
-        // Planets/Celestial bodies being sucked
-        class Planet {
-            constructor() {
-                this.reset(true);
-            }
-
-            reset(initial = false) {
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
-
-                // Select random planet image
-                this.image = planetImages[Math.floor(Math.random() * planetImages.length)];
-
-                if (withBlackHole && !initial) {
-                    // Respawn outside viewport
-                    const angle = Math.random() * Math.PI * 2;
-                    const maxDist = Math.max(canvas.width, canvas.height);
-                    this.radius = maxDist * 0.6 + Math.random() * 300;
-                    this.x = centerX + Math.cos(angle) * this.radius;
-                    this.y = centerY + Math.sin(angle) * this.radius;
-                    this.angle = angle;
-                } else {
-                    // Random distribution
-                    const angle = Math.random() * Math.PI * 2;
-                    const maxDist = Math.max(canvas.width, canvas.height);
-                    this.radius = Math.random() * maxDist * 0.8 + 100;
-                    this.x = centerX + Math.cos(angle) * this.radius;
-                    this.y = centerY + Math.sin(angle) * this.radius;
-                    this.angle = angle;
-                }
-
-                this.size = 15 + Math.random() * 25; // Larger size for images
-                this.rotation = Math.random() * Math.PI * 2;
-                this.rotationSpeed = (Math.random() - 0.5) * 0.02;
-
-                // Slower speeds
-                this.orbitSpeed = withBlackHole ? 0.0002 : 0;
-                this.pullSpeed = withBlackHole ? 0.05 : 0; // Much slower suction
-            }
-
-            update() {
-                if (withBlackHole) {
-                    const centerX = canvas.width / 2;
-                    const centerY = canvas.height / 2;
-
-                    // Pull towards center - slower acceleration
-                    this.radius -= this.pullSpeed * (1 + (100 / (this.radius + 1)));
-
-                    // Orbit
-                    this.angle += this.orbitSpeed * (100 / (this.radius + 50));
-                    this.rotation += this.rotationSpeed;
-
-                    // Update position with tilt
-                    const tilt = 0.7;
-                    this.x = centerX + Math.cos(this.angle) * this.radius;
-                    this.y = centerY + Math.sin(this.angle) * this.radius * tilt;
-
-                    // Reset if absorbed
-                    if (this.radius < 30) {
-                        this.reset();
-                    }
-                }
-            }
-
-            draw() {
-                const opacity = withBlackHole ? Math.min(1, (this.radius - 30) / 200) : 0.8;
-
-                ctx.save();
-                ctx.globalAlpha = opacity;
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation);
-
-                // Draw image if loaded, otherwise fallback to circle
-                if (this.image.complete) {
-                    // Create circular clip
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
-                    ctx.clip();
-
-                    ctx.drawImage(this.image, -this.size / 2, -this.size / 2, this.size, this.size);
-                } else {
-                    ctx.fillStyle = '#4facfe';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                ctx.restore();
-            }
-        }
-
         // Initialize
         for (let i = 0; i < 300; i++) {
             stars.push(new Star());
-        }
-
-        // Create planets
-        if (withBlackHole) {
-            for (let i = 0; i < 40; i++) {
-                planets.push(new Planet());
-            }
         }
 
         let time = 0;
@@ -176,7 +57,7 @@ const GalaxyBackground = ({ withBlackHole = false }) => {
             // Draw stars
             stars.forEach(star => star.draw());
 
-            // Draw black hole visuals (behind planets)
+            // Draw black hole visuals
             if (withBlackHole) {
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
@@ -209,19 +90,8 @@ const GalaxyBackground = ({ withBlackHole = false }) => {
                 }
 
                 ctx.restore();
-            }
 
-            // Draw and update planets
-            planets.forEach(planet => {
-                planet.update();
-                planet.draw();
-            });
-
-            // Draw Event Horizon (Foreground)
-            if (withBlackHole) {
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
-
+                // Event Horizon (Foreground)
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.scale(1, 0.6); // Match tilt

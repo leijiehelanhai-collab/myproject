@@ -82,7 +82,7 @@ function HomePage({ account, connectWallet }) {
 
               {/* Main Title with Enhanced Effects */}
               <div className="relative py-8">
-                <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black leading-[0.9] tracking-tighter text-white font-game drop-shadow-[0_0_30px_rgba(0,243,255,0.3)] text-glitch text-dynamic" data-text={t('home.hero_title')}>
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.9] tracking-tighter text-white font-cosmic drop-shadow-[0_0_30px_rgba(0,243,255,0.3)] text-glitch text-dynamic" data-text={t('home.hero_title')}>
                   {t('home.hero_title')}
                 </h1>
                 <div className="absolute -inset-8 bg-gradient-to-r from-transparent via-neon-blue/15 to-transparent blur-3xl -z-10 animate-pulse"></div>
@@ -172,7 +172,7 @@ function HomePage({ account, connectWallet }) {
         <section className="py-20 px-4 bg-black/40 border-y border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight font-game text-dynamic">{t('home.philosophy.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight font-cosmic text-dynamic">{t('home.philosophy.title')}</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-8 mb-10">
               {philosophy.map((item, idx) => (
@@ -191,7 +191,7 @@ function HomePage({ account, connectWallet }) {
         <section className="py-20 px-4 relative">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-game text-glow-cyan text-dynamic">{t('home.thermodynamics.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-glow-cyan text-dynamic">{t('home.thermodynamics.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.thermodynamics.subtitle')}</p>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
@@ -229,7 +229,7 @@ function HomePage({ account, connectWallet }) {
         <section className="py-20 px-4 bg-black/40 border-y border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-game text-dynamic">{t('home.binary_system.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-dynamic">{t('home.binary_system.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.binary_system.subtitle')}</p>
             </div>
             <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -280,7 +280,7 @@ function HomePage({ account, connectWallet }) {
         <section className="py-20 px-4 relative">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-game text-dynamic">{t('home.roadmap.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-dynamic">{t('home.roadmap.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.roadmap.subtitle')}</p>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -313,7 +313,7 @@ function HomePage({ account, connectWallet }) {
         <section id="ecosystem" className="py-20 px-4 relative">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-game text-dynamic">{t('home.ecosystem.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-dynamic">{t('home.ecosystem.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.ecosystem.desc')}</p>
             </div>
 
@@ -426,7 +426,7 @@ function HomePage({ account, connectWallet }) {
 
         {/* FAQ SECTION */}
         <section className="py-20 px-4 max-w-5xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-black mb-12 text-center font-game text-dynamic">{t('home.faq.title')}</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-12 text-center font-cosmic text-dynamic">{t('home.faq.title')}</h2>
           <div className="space-y-4">
             <FaqItem
               question={t('home.faq.q1')}
@@ -500,7 +500,7 @@ function HomePage({ account, connectWallet }) {
 
 
 const PhilosophyCard = ({ title, desc }) => (
-  <div className="game-card-enhanced card-dynamic-border p-8 rounded-2xl">
+  <div className="game-card-enhanced card-dynamic-border p-8 rounded-2xl hover:scale-105 transition-transform duration-500">
     <div className="game-card-corner corner-tl"></div>
     <div className="game-card-corner corner-tr"></div>
     <div className="game-card-corner corner-bl"></div>
@@ -513,7 +513,7 @@ const PhilosophyCard = ({ title, desc }) => (
 );
 
 const FeatureItem = ({ title, desc, icon }) => (
-  <div className="p-8 rounded-2xl bg-gradient-to-b from-white/5 to-transparent border border-white/5 hover:border-neon-blue/30 transition-all duration-300 group hover:-translate-y-2 card-dynamic-border">
+  <div className="p-8 rounded-2xl bg-gradient-to-b from-white/5 to-transparent border border-white/5 hover:border-neon-blue/30 transition-all duration-300 group hover:-translate-y-2 card-dynamic-border hover:shadow-[0_0_30px_rgba(0,243,255,0.15)]">
     <div className="mb-6 p-4 bg-black rounded-full w-fit border border-white/10 group-hover:border-neon-blue/50 transition-colors">{icon}</div>
     <h3 className="text-xl font-bold mb-3 text-white group-hover:text-neon-blue transition-colors">{title}</h3>
     <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>

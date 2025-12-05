@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap');
+
 :root {
   --neon-blue: #00f3ff;
   --neon-pink: #ff00ff;
@@ -38,6 +40,11 @@ body {
 .font-game {
   font-family: 'Rajdhani', sans-serif;
   /* Assuming a tech font is imported or falls back */
+}
+
+.font-cosmic {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
 }
 
 .clip-corner {
@@ -1360,6 +1367,7 @@ body {
   from {
     text-shadow: 0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3);
   }
+
   to {
     text-shadow: 0 0 20px rgba(0, 243, 255, 0.8), 0 0 30px rgba(188, 19, 254, 0.6);
   }
