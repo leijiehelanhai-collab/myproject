@@ -179,6 +179,27 @@ export const translations = {
                 title: 'Cross the Event Horizon',
                 desc: 'No inflation. No mercy. Just the art of annihilation.',
                 btn: 'CONNECT INTERFACE'
+            },
+            entropy: {
+                section_title: 'THE ART OF NEGENTROPY',
+                module1: {
+                    tag: 'ENTROPY_PROBLEM',
+                    title: 'Cosmic Heat Death',
+                    content: 'The universe tends toward maximum entropy—disorder, chaos, heat death. In traditional crypto economies, inflation is the original sin. Unlimited token minting dilutes value like an expanding universe cooling toward absolute zero.\n\nEvery new token is a step closer to economic heat death. The end state is inevitable: worthless assets scattered across a cold, dead blockchain.',
+                    keywords: ['heat death', 'inflation', 'entropy', 'dilutes value']
+                },
+                module2: {
+                    tag: 'BLACK_HOLE_SOLUTION',
+                    title: 'B.A.P. Mechanism',
+                    content: 'BNB Annihilation Protocol is a reverse singularity—a black hole that devours tokens irreversibly. Every game interaction triggers permanent burning. Tokens cross the event horizon and vanish into address 0x00...dead.\n\nThis is not deflation. This is annihilation. We don\'t reduce supply—we erase it from existence. The protocol is a one-way membrane: enter, burn, never return.',
+                    keywords: ['black hole', 'irreversibly', 'annihilation', 'event horizon', 'one-way']
+                },
+                module3: {
+                    tag: 'VALUE_SINGULARITY',
+                    title: 'Scarcity Capture',
+                    content: 'As total supply collapses toward zero, remaining tokens compress into a value singularity. Scarcity is not manufactured—it is mathematically enforced. Each burn increases the gravitational pull on remaining value.\n\nWinners don\'t just earn rewards—they capture concentrated value from a shrinking universe. This is financial alchemy: transforming abundance into scarcity, chaos into order.',
+                    keywords: ['singularity', 'scarcity', 'mathematically enforced', 'concentrated value', 'alchemy']
+                }
             }
         },
         game: {
@@ -489,6 +510,27 @@ export const translations = {
                 title: '跨越事件视界',
                 desc: '没有通胀，只有湮灭的艺术。',
                 btn: '连接界面'
+            },
+            entropy: {
+                section_title: '熵减的艺术',
+                module1: {
+                    tag: '熵问题',
+                    title: '宇宙热寂',
+                    content: '宇宙趋向于最大熵——无序、混沌、热寂。在传统加密经济中，通胀是原罪。无限制的代币增发稀释价值，就像膨胀的宇宙冷却至绝对零度。\n\n每一个新代币都是向经济热寂迈进的一步。终局不可避免：毫无价值的资产散落在冰冷、死寂的区块链上。',
+                    keywords: ['热寂', '通胀', '熵', '稀释价值']
+                },
+                module2: {
+                    tag: '黑洞解决方案',
+                    title: 'B.A.P. 机制',
+                    content: 'BNB 湮灭协议是一个逆向奇点——一个不可逆地吞噬代币的黑洞。每一次游戏交互都会触发永久销毁。代币跨越事件视界，消失在地址 0x00...dead 中。\n\n这不是通缩。这是湮灭。我们不减少供应——我们将其从存在中抹除。协议是一个单向膜：进入、燃烧、永不返回。',
+                    keywords: ['黑洞', '不可逆', '湮灭', '事件视界', '单向']
+                },
+                module3: {
+                    tag: '价值奇点',
+                    title: '稀缺性捕获',
+                    content: '随着总供应量向零坍缩，剩余代币压缩成价值奇点。稀缺性不是制造出来的——它是数学强制执行的。每次销毁都会增加对剩余价值的引力。\n\n赢家不仅仅是赚取奖励——他们从收缩的宇宙中捕获浓缩价值。这是金融炼金术：将丰富转化为稀缺，将混沌转化为秩序。',
+                    keywords: ['奇点', '稀缺性', '数学强制', '浓缩价值', '炼金术']
+                }
             }
         },
         game: {

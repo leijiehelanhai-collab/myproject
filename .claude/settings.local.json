@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npm run build)",
-      "Bash(dir components)"
+      "Bash(dir components)",
+      "Bash(git checkout HEAD~1 -- \"src/HomePage.jsx\")",
+      "Bash(npm start)"
     ],
     "deny": [],
     "ask": []

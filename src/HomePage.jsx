@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from './contexts/LanguageContext';
 import GalaxyBackground from './components/GalaxyBackground';
+import EntropyManifesto from './components/EntropyManifesto';
 import {
   ArrowRight,
   ChevronDown,
@@ -82,7 +83,7 @@ function HomePage({ account, connectWallet }) {
 
               {/* Main Title with Enhanced Effects */}
               <div className="relative py-8">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.9] tracking-tighter text-white font-cosmic drop-shadow-[0_0_30px_rgba(0,243,255,0.3)] text-glitch text-dynamic" data-text={t('home.hero_title')}>
+                <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black leading-[0.9] tracking-tighter text-white font-game drop-shadow-[0_0_30px_rgba(0,243,255,0.3)] text-glitch text-dynamic" data-text={t('home.hero_title')}>
                   {t('home.hero_title')}
                 </h1>
                 <div className="absolute -inset-8 bg-gradient-to-r from-transparent via-neon-blue/15 to-transparent blur-3xl -z-10 animate-pulse"></div>
@@ -141,38 +142,14 @@ function HomePage({ account, connectWallet }) {
           </div>
         </section>
 
-        {/* PREFACE */}
-        <section id="preface" className="py-20 px-4 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/5 pointer-events-none"></div>
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-4">
-              <div className="text-sm font-mono text-neon-blue tracking-[0.3em] uppercase text-decode">{t('home.preface.title')}</div>
-              <p className="text-xl text-white leading-relaxed font-body">{t('home.preface.p1')}</p>
-              <p className="text-lg text-gray-300 leading-relaxed font-body">{t('home.preface.p2')}</p>
-              <p className="text-lg text-gray-300 leading-relaxed font-body">{t('home.preface.p3')}</p>
-            </div>
-            <div className="relative bg-gradient-to-br from-neon-blue/15 via-black/80 to-neon-pink/10 border border-neon-blue/30 rounded-3xl p-10 backdrop-blur-md shadow-[0_0_40px_rgba(0,243,255,0.15)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,243,255,0.25),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(255,0,153,0.2),transparent_30%)] opacity-60"></div>
-              <div className="relative space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-neon-blue rounded-full animate-pulse"></div>
-                  <span className="text-sm font-mono text-gray-300 tracking-[0.2em]">NEGENTROPY MANIFESTO</span>
-                </div>
-                <div className="h-0.5 w-full bg-gradient-to-r from-neon-blue via-transparent to-neon-pink opacity-60"></div>
-                <div className="space-y-3 text-sm text-gray-200 font-mono leading-relaxed">
-                  <p>{t('home.philosophy.f1_title')} · {t('home.philosophy.f1_desc')}</p>
-                  <p>{t('home.philosophy.f2_title')} · {t('home.philosophy.f2_desc')}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* ENTROPY MANIFESTO - New Modular Design */}
+        <EntropyManifesto />
 
         {/* PHILOSOPHY */}
         <section className="py-20 px-4 bg-black/40 border-y border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight font-cosmic text-dynamic">{t('home.philosophy.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight font-game text-dynamic">{t('home.philosophy.title')}</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-8 mb-10">
               {philosophy.map((item, idx) => (
@@ -191,7 +168,7 @@ function HomePage({ account, connectWallet }) {
         <section className="py-20 px-4 relative">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-glow-cyan text-dynamic">{t('home.thermodynamics.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-game text-glow-cyan text-dynamic">{t('home.thermodynamics.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.thermodynamics.subtitle')}</p>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
@@ -229,7 +206,7 @@ function HomePage({ account, connectWallet }) {
         <section className="py-20 px-4 bg-black/40 border-y border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-dynamic">{t('home.binary_system.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-game text-dynamic">{t('home.binary_system.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.binary_system.subtitle')}</p>
             </div>
             <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -255,18 +232,28 @@ function HomePage({ account, connectWallet }) {
               </div>
             </div>
             {/* Protocol Loop */}
-            <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+            <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 overflow-hidden group hover:border-neon-blue/30 transition-all duration-500">
               <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+              {/* Ambient Glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-neon-blue/10 blur-[100px] rounded-full pointer-events-none"></div>
+
               <div className="relative z-10">
-                <h3 className="text-2xl font-bold mb-8 text-center text-glow-cyan">{t('home.binary_system.loop.title')}</h3>
-                <div className="flex flex-wrap items-center justify-center gap-4">
+                <h3 className="text-2xl font-bold mb-10 text-center text-glow-cyan tracking-widest uppercase">{t('home.binary_system.loop.title')}</h3>
+
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-4">
                   {t('home.binary_system.loop.steps').map((step, idx) => (
                     <React.Fragment key={idx}>
-                      <div className="px-6 py-3 bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 border border-neon-blue/40 rounded-lg">
-                        <span className="text-lg font-mono font-bold">{step}</span>
+                      <div className="relative group/step">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-blue to-purple-600 rounded-lg blur opacity-20 group-hover/step:opacity-75 transition duration-500"></div>
+                        <div className="relative px-8 py-4 bg-black/80 border border-white/10 rounded-lg backdrop-blur-xl flex items-center justify-center min-w-[140px]">
+                          <span className="text-lg font-mono font-bold text-white group-hover/step:text-neon-blue transition-colors">{step}</span>
+                        </div>
                       </div>
+
                       {idx < t('home.binary_system.loop.steps').length - 1 && (
-                        <ArrowRight className="w-6 h-6 text-neon-blue" />
+                        <div className="text-neon-blue/50 animate-pulse">
+                          <ArrowRight className="w-6 h-6 rotate-90 md:rotate-0 transform transition-transform" />
+                        </div>
                       )}
                     </React.Fragment>
                   ))}
@@ -280,7 +267,7 @@ function HomePage({ account, connectWallet }) {
         <section className="py-20 px-4 relative">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-dynamic">{t('home.roadmap.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-game text-dynamic">{t('home.roadmap.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.roadmap.subtitle')}</p>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -313,7 +300,7 @@ function HomePage({ account, connectWallet }) {
         <section id="ecosystem" className="py-20 px-4 relative">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-14 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-black font-cosmic text-dynamic">{t('home.ecosystem.title')}</h2>
+              <h2 className="text-4xl md:text-5xl font-black font-game text-dynamic">{t('home.ecosystem.title')}</h2>
               <p className="text-lg text-gray-300 max-w-3xl mx-auto font-body">{t('home.ecosystem.desc')}</p>
             </div>
 
@@ -426,7 +413,7 @@ function HomePage({ account, connectWallet }) {
 
         {/* FAQ SECTION */}
         <section className="py-20 px-4 max-w-5xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-black mb-12 text-center font-cosmic text-dynamic">{t('home.faq.title')}</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-12 text-center font-game text-dynamic">{t('home.faq.title')}</h2>
           <div className="space-y-4">
             <FaqItem
               question={t('home.faq.q1')}
@@ -500,7 +487,7 @@ function HomePage({ account, connectWallet }) {
 
 
 const PhilosophyCard = ({ title, desc }) => (
-  <div className="game-card-enhanced card-dynamic-border p-8 rounded-2xl hover:scale-105 transition-transform duration-500">
+  <div className="game-card-enhanced card-dynamic-border p-8 rounded-2xl">
     <div className="game-card-corner corner-tl"></div>
     <div className="game-card-corner corner-tr"></div>
     <div className="game-card-corner corner-bl"></div>
@@ -513,7 +500,7 @@ const PhilosophyCard = ({ title, desc }) => (
 );
 
 const FeatureItem = ({ title, desc, icon }) => (
-  <div className="p-8 rounded-2xl bg-gradient-to-b from-white/5 to-transparent border border-white/5 hover:border-neon-blue/30 transition-all duration-300 group hover:-translate-y-2 card-dynamic-border hover:shadow-[0_0_30px_rgba(0,243,255,0.15)]">
+  <div className="p-8 rounded-2xl bg-gradient-to-b from-white/5 to-transparent border border-white/5 hover:border-neon-blue/30 transition-all duration-300 group hover:-translate-y-2 card-dynamic-border">
     <div className="mb-6 p-4 bg-black rounded-full w-fit border border-white/10 group-hover:border-neon-blue/50 transition-colors">{icon}</div>
     <h3 className="text-xl font-bold mb-3 text-white group-hover:text-neon-blue transition-colors">{title}</h3>
     <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
